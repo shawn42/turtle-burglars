@@ -4,12 +4,12 @@
 (def all-players [:red :blue :green :purple])
 
 (defn make-player [color] 
-  {:color color :tokens 0 :skip-next-turn false})
+  {:color color :tokens 0 :skip-next-turn false :tile :tile1})
 
 (defn make-tile 
   ([] (make-tile :emtpy 0))
   ([tile-type value] 
-    {:tile-type tile-type :value value}) )
+   {:tile-type tile-type :value value}) )
 
 (defn make-players [num-players] 
   {:pre [(<= 2 num-players (count all-players))]}
@@ -18,27 +18,109 @@
 (defn make-board [] 
   {:graph {
            :tile1 [:tile2]
-           :tile2 [:tile3, :tile1]
+           :tile2 [:tile3]
+           :tile3 [:tile4]
+           :tile4 [:tile5]
+           :tile5 [:tile6]
+           :tile6 [:tile7]
+           :tile7 [:tile8]
+           :tile8 [:tile9]
+           :tile9 [:tile10]
+           :tile10 [:tile11]
+           :tile11 [:tile12]
+           :tile12 [:tile13]
+           :tile13 [:tile14]
+           :tile14 [:tile15]
+           :tile15 [:tile16]
+           :tile16 [:tile17]
+           :tile17 [:tile18]
+           :tile18 [:tile19]
+           :tile19 [:tile20]
+           :tile20 [:tile21]
+           :tile21 [:tile22]
+           :tile22 [:tile23]
+           :tile23 [:tile24]
+           :tile24 [:tile25]
+           :tile25 [:tile26]
+           :tile26 [:tile27]
+           :tile27 [:tile28]
+           :tile28 [:tile29]
+           :tile29 [:tile1]
            } 
    :tiles {
            :tile1 (make-tile :token-change 2) 
            :tile2 (make-tile :token-change -1)
            :tile3 (make-tile)
+           :tile4 (make-tile :token-change 1)
+           :tile5 (make-tile)
+           :tile6 (make-tile)
+           :tile7 (make-tile)
+           :tile8 (make-tile)
+           :tile9 (make-tile :token-change 2)
+           :tile10 (make-tile)
+           :tile11 (make-tile)
+           :tile12 (make-tile)
+           :tile13 (make-tile)
+           :tile14 (make-tile :token-change 2)
+           :tile15 (make-tile)
+           :tile16 (make-tile)
+           :tile17 (make-tile)
+           :tile18 (make-tile)
+           :tile19 (make-tile :token-change 2)
+           :tile20 (make-tile)
+           :tile21 (make-tile)
+           :tile22 (make-tile)
+           :tile23 (make-tile)
+           :tile24 (make-tile)
+           :tile25 (make-tile :token-change 2)
+           :tile26 (make-tile)
+           :tile27 (make-tile)
+           :tile28 (make-tile)
+           :tile29 (make-tile)
            }})
 
 (defn make-game []
-  {:board (make-board) :players (make-players 2) :turn 0})
+  (let [the-players (make-players 2)] 
+    {:board (make-board) :players (zipmap (map :color the-players) the-players) :turn 0 :next-players (cycle (map :color the-players))}))
 
 (defn display-game [game]
-  (pprint game))
+  (pprint {:turn (:turn game) :players (:players game)}))
 
-(defn play-turn [game]
-  (update game :turn inc))
+(defn roll-die []
+  (inc (rand-int 6)))
+
+(defn move-player [game current-player moves] 
+  (loop [g game i 0]
+    (if (< i moves)
+      (let [current-tile (get-in g [:players current-player :tile])]
+        (recur (assoc-in g [:players current-player :tile] 
+                  (first (get-in g [:board :graph current-tile])))
+              (inc i)))
+        g)))
+
+(defn roll-and-move [game current-player] 
+  (move-player game current-player (roll-die)))
+
+(defn play-player [game current-player] 
+  (if (get-in game [:players current-player :skip-next-turn])
+    (assoc-in game [:players current-player :skip-next-turn] false)
+    (roll-and-move game current-player)))
+
+(defn play-turn [game] (let [ current-player (first (:next-players game)) ]
+    (-> game
+        (assoc :previous-game game)
+        (play-player current-player)
+        (update :next-players rest)
+        (update :turn inc))))
+
+(defn do-stuff [game]
+  (doseq [turn-state (take-while (complement nil?) (iterate :previous-game game))]
+    (display-game turn-state) ))
 
 (defn -main
   [& args]
-  (loop [game (make-game)]
-    (display-game game)
-    (when (< (:turn game) 4)
-      (recur (play-turn game)))))
+  (display-game (loop [game (make-game)]
+                  (if (< (:turn game) 4) 
+                    (recur (play-turn game)) 
+                    game))))
 
