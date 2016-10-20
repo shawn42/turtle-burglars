@@ -8,6 +8,7 @@
 
 (defn make-tile 
   ([] (make-tile :emtpy 0))
+  ([tile-type] (make-tile tile-type 0))
   ([tile-type value] 
    {:tile-type tile-type :value value}) )
 
@@ -36,7 +37,7 @@
            :tile17 [:tile18]
            :tile18 [:tile19]
            :tile19 [:tile20]
-           :tile20 [:tile21]
+           :tile20 [:tile21, :tile29]
            :tile21 [:tile22]
            :tile22 [:tile23]
            :tile23 [:tile24]
@@ -58,7 +59,7 @@
            :tile8 (make-tile)
            :tile9 (make-tile :token-change 2)
            :tile10 (make-tile)
-           :tile11 (make-tile)
+           :tile11 (make-tile :lose-a-turn)
            :tile12 (make-tile)
            :tile13 (make-tile)
            :tile14 (make-tile :token-change 2)
@@ -67,14 +68,14 @@
            :tile17 (make-tile)
            :tile18 (make-tile)
            :tile19 (make-tile :token-change 2)
-           :tile20 (make-tile)
+           :tile20 (make-tile :shortcut-option 5)
            :tile21 (make-tile)
            :tile22 (make-tile)
            :tile23 (make-tile)
            :tile24 (make-tile)
            :tile25 (make-tile :token-change 2)
            :tile26 (make-tile)
-           :tile27 (make-tile)
+           :tile27 (make-tile :steal)
            :tile28 (make-tile)
            :tile29 (make-tile)
            }})
@@ -120,7 +121,7 @@
 (defn -main
   [& args]
   (display-game (loop [game (make-game)]
-                  (if (< (:turn game) 4) 
+                  (if (< (:turn game) 10) 
                     (recur (play-turn game)) 
                     game))))
 
