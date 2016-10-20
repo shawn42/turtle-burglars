@@ -7,7 +7,7 @@
   {:color color :tokens 0 :skip-next-turn false :tile :tile1})
 
 (defn make-tile 
-  ([] (make-tile :emtpy 0))
+  ([] (make-tile :empty 0))
   ([tile-type] (make-tile tile-type 0))
   ([tile-type value] 
    {:tile-type tile-type :value value}) )
@@ -15,6 +15,28 @@
 (defn make-players [num-players] 
   {:pre [(<= 2 num-players (count all-players))]}
   (map make-player (take num-players all-players)))
+
+(defn spy [x]
+  (println x)
+  x)
+
+(defmulti forward-from (fn [game t _ _] (get-in game [:board :tiles t :tile-type])))
+
+(defmethod forward-from :empty [game tile player n]
+  (if (zero? n)
+    (assoc-in game [:players player :tile] tile)
+    (let [next-tile (first (get-in game [:board :graph tile]))]
+      (forward-from game next-tile player (dec n)))))
+
+(defmethod forward-from :token-change [game tile player n]
+  (if (zero? n)
+    (let [delta (get-in game [:board :tiles tile :value])]
+      (-> game
+        (update-in [:players player :tokens] + delta)
+        (update-in [:players player :tokens] max 0)
+        (assoc-in [:players player :tile] tile)))
+    (let [next-tile (first (get-in game [:board :graph tile]))]
+      (forward-from game next-tile player (dec n)))))
 
 (defn make-board [] 
   {:graph {
@@ -59,7 +81,7 @@
            :tile8 (make-tile)
            :tile9 (make-tile :token-change 2)
            :tile10 (make-tile)
-           :tile11 (make-tile :lose-a-turn)
+           :tile11 (make-tile #_:lose-a-turn)
            :tile12 (make-tile)
            :tile13 (make-tile)
            :tile14 (make-tile :token-change 2)
@@ -68,14 +90,14 @@
            :tile17 (make-tile)
            :tile18 (make-tile)
            :tile19 (make-tile :token-change 2)
-           :tile20 (make-tile :shortcut-option 5)
+           :tile20 (make-tile #_:shortcut-option #_5)
            :tile21 (make-tile)
            :tile22 (make-tile)
            :tile23 (make-tile)
            :tile24 (make-tile)
            :tile25 (make-tile :token-change 2)
            :tile26 (make-tile)
-           :tile27 (make-tile :steal)
+           :tile27 (make-tile #_:steal)
            :tile28 (make-tile)
            :tile29 (make-tile)
            }})
@@ -91,13 +113,12 @@
   (inc (rand-int 6)))
 
 (defn move-player [game current-player moves] 
-  (loop [g game i 0]
-    (if (< i moves)
-      (let [current-tile (get-in g [:players current-player :tile])]
-        (recur (assoc-in g [:players current-player :tile] 
-                  (first (get-in g [:board :graph current-tile])))
-              (inc i)))
-        g)))
+  (let [tile (get-in game [:players current-player :tile])
+        next-tile (first (get-in game [:board :graph tile]))]
+    (forward-from game
+                  next-tile
+                  current-player
+                  (dec moves))))
 
 (defn roll-and-move [game current-player] 
   (move-player game current-player (roll-die)))
