@@ -15,12 +15,12 @@
 
 (defn make-player [i color] 
   {:color color
-   :tokens (- (count all-players) (- (count all-players) i))
+   :tokens (if (zero? i) 0 1)
    :skip-next-turn false
    :tile :tile1
    :has-won false
    :lost-turns 0
-   :take-shortcut (fn [player]
+   :take-shortcut (constantly false) #_(fn [player]
                     (or (= :purple color)
                         (and (= :green color)
                              (<= 18 (:tokens player)))))})
@@ -153,7 +153,7 @@
            }})
 
 (defn make-game []
-  (let [the-players (make-players 4)] 
+  (let [the-players (make-players 2)] 
     {:board (make-board)
      :players (zipmap (map :color the-players) the-players)
      :turn 0
