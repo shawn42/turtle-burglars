@@ -99,7 +99,7 @@
            :tile6 (make-tile :token-change 2)
            :tile7 (make-tile)
            :tile8 (make-tile)
-           :tile9 (make-tile :token-change 2)
+           :tile9 (make-tile :token-change 3)
            :tile10 (make-tile)
            :tile11 (make-tile :lose-a-turn)
            :tile12 (make-tile)
@@ -109,7 +109,7 @@
            :tile16 (make-tile)
            :tile17 (make-tile :lose-a-turn)
            :tile18 (make-tile)
-           :tile19 (make-tile :token-change 2)
+           :tile19 (make-tile :token-change 3)
            :tile20 (make-tile :shortcut-option 5)
            :tile21 (make-tile)
            :tile22 (make-tile)
@@ -152,23 +152,30 @@
   (some true? (map :has-won (second (:players game)))))
 
 (defn play-turn [game] 
-  (if (has-winner? game)
-    game
-    (let [ current-player (first (:next-players game)) ]
-      (-> game
-          (assoc :previous-game game)
-          (play-player current-player)
-          (update :next-players rest)
-          (update :turn inc)))))
+  (let [ current-player (first (:next-players game)) ]
+    (-> game
+        (assoc :previous-game game)
+        (play-player current-player)
+        (update :next-players rest)
+        (update :turn inc))))
 
 (defn do-stuff [game]
   (doseq [turn-state (take-while (complement nil?) (iterate :previous-game game))]
     (display-game turn-state) ))
 
+(defn play-game [] 
+  (loop [game (make-game)]
+    (if (not (has-winner? game))
+      (recur (play-turn game)) 
+      game)))
+
+(defn avg [xs]
+  (/ (reduce + xs) (count xs)))
+
 (defn -main
   [& args]
-  (display-game (loop [game (make-game)]
-                  (if (not (has-winner? game))
-                    (recur (play-turn game)) 
-                    game))))
+  ;; (display-game (play-game)))
+  ;; (display-game (first (take 5 (map play-game)))))
+  ;; (display-game (last (repeatedly 10000 #(play-game)))))
+  (spy (avg (map :turn (repeatedly 10000 #(play-game))))))
 
