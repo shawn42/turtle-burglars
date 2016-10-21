@@ -179,3 +179,6 @@
   ;; (display-game (last (repeatedly 10000 #(play-game)))))
   (spy (avg (map :turn (repeatedly 10000 #(play-game))))))
 
+(comment
+  (-main)
+  )

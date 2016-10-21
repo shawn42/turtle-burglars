@@ -6,4 +6,5 @@
   :dependencies [[org.clojure/clojure "1.8.0"]]
   :main ^:skip-aot turtles.core
   :target-path "target/%s"
+  :plugins [[lein-gorilla "0.3.6"]]
   :profiles {:uberjar {:aot :all}})
