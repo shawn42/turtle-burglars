@@ -14,6 +14,7 @@
 (ns outrageous-summer
   (:require [gorilla-plot.core :as plot]
             [turtles.core :as turts]))
+(require 'turtles.core :reload)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
@@ -60,13 +61,13 @@
   (plot/bar-chart (keys freqs) (vals freqs)))
 ;; @@
 ;; ->
-;;; {:purple 2316, :red 2658, :blue 2567, :green 2459}
+;;; {:red 2748, :purple 2315, :blue 2554, :green 2383}
 ;;; 
 ;; <-
 ;; =>
-;;; {"type":"vega","content":{"width":400,"height":247.2187957763672,"padding":{"top":10,"left":55,"bottom":40,"right":10},"data":[{"name":"e62d9eca-d26b-4003-bd4f-4e6106027a15","values":[{"x":"purple","y":2316},{"x":"red","y":2658},{"x":"blue","y":2567},{"x":"green","y":2459}]}],"marks":[{"type":"rect","from":{"data":"e62d9eca-d26b-4003-bd4f-4e6106027a15"},"properties":{"enter":{"x":{"scale":"x","field":"data.x"},"width":{"scale":"x","band":true,"offset":-1},"y":{"scale":"y","field":"data.y"},"y2":{"scale":"y","value":0}},"update":{"fill":{"value":"steelblue"},"opacity":{"value":1}},"hover":{"fill":{"value":"#FF29D2"}}}}],"scales":[{"name":"x","type":"ordinal","range":"width","domain":{"data":"e62d9eca-d26b-4003-bd4f-4e6106027a15","field":"data.x"}},{"name":"y","range":"height","nice":true,"domain":{"data":"e62d9eca-d26b-4003-bd4f-4e6106027a15","field":"data.y"}}],"axes":[{"type":"x","scale":"x"},{"type":"y","scale":"y"}]},"value":"#gorilla_repl.vega.VegaView{:content {:width 400, :height 247.2188, :padding {:top 10, :left 55, :bottom 40, :right 10}, :data [{:name \"e62d9eca-d26b-4003-bd4f-4e6106027a15\", :values ({:x :purple, :y 2316} {:x :red, :y 2658} {:x :blue, :y 2567} {:x :green, :y 2459})}], :marks [{:type \"rect\", :from {:data \"e62d9eca-d26b-4003-bd4f-4e6106027a15\"}, :properties {:enter {:x {:scale \"x\", :field \"data.x\"}, :width {:scale \"x\", :band true, :offset -1}, :y {:scale \"y\", :field \"data.y\"}, :y2 {:scale \"y\", :value 0}}, :update {:fill {:value \"steelblue\"}, :opacity {:value 1}}, :hover {:fill {:value \"#FF29D2\"}}}}], :scales [{:name \"x\", :type \"ordinal\", :range \"width\", :domain {:data \"e62d9eca-d26b-4003-bd4f-4e6106027a15\", :field \"data.x\"}} {:name \"y\", :range \"height\", :nice true, :domain {:data \"e62d9eca-d26b-4003-bd4f-4e6106027a15\", :field \"data.y\"}}], :axes [{:type \"x\", :scale \"x\"} {:type \"y\", :scale \"y\"}]}}"}
+;;; {"type":"vega","content":{"width":400,"height":247.2187957763672,"padding":{"top":10,"left":55,"bottom":40,"right":10},"data":[{"name":"b1f3e0c2-b3ff-4be5-9542-3ca252b95f61","values":[{"x":"red","y":2748},{"x":"purple","y":2315},{"x":"blue","y":2554},{"x":"green","y":2383}]}],"marks":[{"type":"rect","from":{"data":"b1f3e0c2-b3ff-4be5-9542-3ca252b95f61"},"properties":{"enter":{"x":{"scale":"x","field":"data.x"},"width":{"scale":"x","band":true,"offset":-1},"y":{"scale":"y","field":"data.y"},"y2":{"scale":"y","value":0}},"update":{"fill":{"value":"steelblue"},"opacity":{"value":1}},"hover":{"fill":{"value":"#FF29D2"}}}}],"scales":[{"name":"x","type":"ordinal","range":"width","domain":{"data":"b1f3e0c2-b3ff-4be5-9542-3ca252b95f61","field":"data.x"}},{"name":"y","range":"height","nice":true,"domain":{"data":"b1f3e0c2-b3ff-4be5-9542-3ca252b95f61","field":"data.y"}}],"axes":[{"type":"x","scale":"x"},{"type":"y","scale":"y"}]},"value":"#gorilla_repl.vega.VegaView{:content {:width 400, :height 247.2188, :padding {:top 10, :left 55, :bottom 40, :right 10}, :data [{:name \"b1f3e0c2-b3ff-4be5-9542-3ca252b95f61\", :values ({:x :red, :y 2748} {:x :purple, :y 2315} {:x :blue, :y 2554} {:x :green, :y 2383})}], :marks [{:type \"rect\", :from {:data \"b1f3e0c2-b3ff-4be5-9542-3ca252b95f61\"}, :properties {:enter {:x {:scale \"x\", :field \"data.x\"}, :width {:scale \"x\", :band true, :offset -1}, :y {:scale \"y\", :field \"data.y\"}, :y2 {:scale \"y\", :value 0}}, :update {:fill {:value \"steelblue\"}, :opacity {:value 1}}, :hover {:fill {:value \"#FF29D2\"}}}}], :scales [{:name \"x\", :type \"ordinal\", :range \"width\", :domain {:data \"b1f3e0c2-b3ff-4be5-9542-3ca252b95f61\", :field \"data.x\"}} {:name \"y\", :range \"height\", :nice true, :domain {:data \"b1f3e0c2-b3ff-4be5-9542-3ca252b95f61\", :field \"data.y\"}}], :axes [{:type \"x\", :scale \"x\"} {:type \"y\", :scale \"y\"}]}}"}
 ;; <=
 
 ;; @@
-}
+
 ;; @@

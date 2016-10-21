@@ -1,5 +1,8 @@
+
 (ns turtles.core
   (:require [clojure.pprint :refer [pprint]]))
+
+(def tokens-to-win 10)
 
 (defn spy [x]
   (println x)
@@ -10,9 +13,9 @@
 
 (def all-players [:red :blue :green :purple])
 
-(defn make-player [color] 
+(defn make-player [i color] 
   {:color color
-   :tokens 0
+   :tokens (- (count all-players) (- (count all-players) i))
    :skip-next-turn false
    :tile :tile1
    :has-won false
@@ -22,15 +25,15 @@
                         (and (= :green color)
                              (<= 18 (:tokens player)))))})
 
+(defn make-players [num-players] 
+  {:pre [(<= 2 num-players (count all-players))]}
+  (map-indexed make-player (take num-players all-players)))
+
 (defn make-tile 
   ([] (make-tile :empty 0))
   ([tile-type] (make-tile tile-type 0))
   ([tile-type value] 
    {:tile-type tile-type :value value}) )
-
-(defn make-players [num-players] 
-  {:pre [(<= 2 num-players (count all-players))]}
-  (map make-player (take num-players all-players)))
 
 (defmulti forward-from (fn [game t _ _] (get-in game [:board :tiles t :tile-type])))
 
@@ -78,7 +81,7 @@
       (forward-from game next-tile player (dec n)))))
 
 (defmethod forward-from :start-finish [game tile player n]
-  (if (> (get-in game [:players player :tokens]) 10)
+  (if (> (get-in game [:players player :tokens]) tokens-to-win)
     (assoc-in game [:players player :has-won] true)
     (if (zero? n)
       (assoc-in game [:players player :tile] tile)
