@@ -1,10 +1,14 @@
 (ns turtles.core
   (:require [clojure.pprint :refer [pprint]]))
 
+(defn spy [x]
+  (println x)
+  x)
+
 (def all-players [:red :blue :green :purple])
 
 (defn make-player [color] 
-  {:color color :tokens 0 :skip-next-turn false :tile :tile1})
+  {:color color :tokens 0 :skip-next-turn false :tile :tile1 :has-won false})
 
 (defn make-tile 
   ([] (make-tile :empty 0))
@@ -15,10 +19,6 @@
 (defn make-players [num-players] 
   {:pre [(<= 2 num-players (count all-players))]}
   (map make-player (take num-players all-players)))
-
-(defn spy [x]
-  (println x)
-  x)
 
 (defmulti forward-from (fn [game t _ _] (get-in game [:board :tiles t :tile-type])))
 
@@ -37,6 +37,26 @@
         (assoc-in [:players player :tile] tile)))
     (let [next-tile (first (get-in game [:board :graph tile]))]
       (forward-from game next-tile player (dec n)))))
+
+(defmethod forward-from :lose-a-turn [game tile player n]
+  (if (zero? n)
+    (let [delta (get-in game [:board :tiles tile :value])]
+      (-> game
+        (assoc-in [:players player :skip-next-turn] true)
+        (assoc-in [:players player :tile] tile)))
+    (let [next-tile (first (get-in game [:board :graph tile]))]
+      (forward-from game next-tile player (dec n)))))
+
+(defmethod forward-from :shortcut-option [game tile player n]
+  (assoc-in game [:players player :tile] tile))
+
+(defmethod forward-from :start-finish [game tile player n]
+  (if (> (get-in game [:players player :tokens]) 10)
+    (assoc-in game [:players player :has-won] true)
+    (if (zero? n)
+      (assoc-in game [:players player :tile] tile)
+      (let [next-tile (first (get-in game [:board :graph tile]))]
+        (forward-from game next-tile player (dec n)))))) 
 
 (defn make-board [] 
   {:graph {
@@ -71,29 +91,29 @@
            :tile29 [:tile1]
            } 
    :tiles {
-           :tile1 (make-tile :token-change 2) 
+           :tile1 (make-tile :start-finish) 
            :tile2 (make-tile :token-change -1)
            :tile3 (make-tile)
            :tile4 (make-tile :token-change 1)
            :tile5 (make-tile)
-           :tile6 (make-tile)
+           :tile6 (make-tile :token-change 2)
            :tile7 (make-tile)
            :tile8 (make-tile)
            :tile9 (make-tile :token-change 2)
            :tile10 (make-tile)
-           :tile11 (make-tile #_:lose-a-turn)
+           :tile11 (make-tile :lose-a-turn)
            :tile12 (make-tile)
            :tile13 (make-tile)
            :tile14 (make-tile :token-change 2)
            :tile15 (make-tile)
            :tile16 (make-tile)
-           :tile17 (make-tile)
+           :tile17 (make-tile :lose-a-turn)
            :tile18 (make-tile)
            :tile19 (make-tile :token-change 2)
-           :tile20 (make-tile #_:shortcut-option #_5)
+           :tile20 (make-tile :shortcut-option 5)
            :tile21 (make-tile)
            :tile22 (make-tile)
-           :tile23 (make-tile)
+           :tile23 (make-tile :token-change -1)
            :tile24 (make-tile)
            :tile25 (make-tile :token-change 2)
            :tile26 (make-tile)
@@ -128,12 +148,18 @@
     (assoc-in game [:players current-player :skip-next-turn] false)
     (roll-and-move game current-player)))
 
-(defn play-turn [game] (let [ current-player (first (:next-players game)) ]
-    (-> game
-        (assoc :previous-game game)
-        (play-player current-player)
-        (update :next-players rest)
-        (update :turn inc))))
+(defn has-winner? [game]
+  (some true? (map :has-won (second (:players game)))))
+
+(defn play-turn [game] 
+  (if (has-winner? game)
+    game
+    (let [ current-player (first (:next-players game)) ]
+      (-> game
+          (assoc :previous-game game)
+          (play-player current-player)
+          (update :next-players rest)
+          (update :turn inc)))))
 
 (defn do-stuff [game]
   (doseq [turn-state (take-while (complement nil?) (iterate :previous-game game))]
@@ -142,7 +168,7 @@
 (defn -main
   [& args]
   (display-game (loop [game (make-game)]
-                  (if (< (:turn game) 10) 
+                  (if (not (has-winner? game))
                     (recur (play-turn game)) 
                     game))))
 
