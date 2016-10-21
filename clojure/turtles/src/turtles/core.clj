@@ -8,7 +8,7 @@
 (def all-players [:red :blue :green :purple])
 
 (defn make-player [color] 
-  {:color color :tokens 0 :skip-next-turn false :tile :tile1 :has-won false})
+  {:color color :tokens 0 :skip-next-turn false :tile :tile1 :has-won false :lost-turns 0})
 
 (defn make-tile 
   ([] (make-tile :empty 0))
@@ -43,6 +43,7 @@
     (let [delta (get-in game [:board :tiles tile :value])]
       (-> game
         (assoc-in [:players player :skip-next-turn] true)
+        (update-in [:players player :lost-turns] inc)
         (assoc-in [:players player :tile] tile)))
     (let [next-tile (first (get-in game [:board :graph tile]))]
       (forward-from game next-tile player (dec n)))))
@@ -148,8 +149,14 @@
     (assoc-in game [:players current-player :skip-next-turn] false)
     (roll-and-move game current-player)))
 
+(defn find-first [f coll]
+  (first (filter f coll)))
+
+(defn find-winner [game]
+  (find-first :has-won (vals (:players game))))
+
 (defn has-winner? [game]
-  (some true? (map :has-won (second (:players game)))))
+  (some true? (map :has-won (vals (:players game)))))
 
 (defn play-turn [game] 
   (let [ current-player (first (:next-players game)) ]
@@ -177,7 +184,7 @@
   ;; (display-game (play-game)))
   ;; (display-game (first (take 5 (map play-game)))))
   ;; (display-game (last (repeatedly 10000 #(play-game)))))
-  (spy (avg (map :turn (repeatedly 10000 #(play-game))))))
+  (spy (float (avg (map :turn (repeatedly 100 #(play-game)))))))
 
 (comment
   (-main)
