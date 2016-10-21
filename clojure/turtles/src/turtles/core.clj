@@ -2,28 +2,35 @@
 (ns turtles.core
   (:require [clojure.pprint :refer [pprint]]))
 
-(def tokens-to-win 10)
+(def tokens-to-win 14)
+(def tokens-to-take-shortcut 12)
+(def tokens-to-start 1)
+(def num-players 4)
+(def shortcut-cost 4)
+(def sided-die 6)
+(def all-players [:red :blue :green :purple])
 
 (defn spy [x]
   (println x)
   x)
 
 (defn roll-die []
-  (inc (rand-int 6)))
+  (inc (rand-int sided-die)))
 
-(def all-players [:red :blue :green :purple])
 
+   ;; :take-shortcut (fn [player]
+   ;;                  (or (= :green color)
+   ;;                      (and (= :purple color)
+   ;;                           (<= tokens-to-take-shortcut (:tokens player)))))})
 (defn make-player [i color] 
   {:color color
-   :tokens (if (zero? i) 0 1)
+   :tokens (if (zero? i) 0 tokens-to-start)
    :skip-next-turn false
    :tile :tile1
    :has-won false
    :lost-turns 0
-   :take-shortcut (constantly false) #_(fn [player]
-                    (or (= :purple color)
-                        (and (= :green color)
-                             (<= 18 (:tokens player)))))})
+   :laps 0
+   :take-shortcut (constantly (rand-nth [true false]))})
 
 (defn make-players [num-players] 
   {:pre [(<= 2 num-players (count all-players))]}
@@ -86,7 +93,9 @@
     (if (zero? n)
       (assoc-in game [:players player :tile] tile)
       (let [next-tile (first (get-in game [:board :graph tile]))]
-        (forward-from game next-tile player (dec n)))))) 
+        (-> game
+          (update-in [:players player :laps] inc)
+          (forward-from next-tile player (dec n)))))))
 
 (defn make-board [] 
   {:graph {
@@ -116,15 +125,12 @@
            :tile24 [:tile25]
            :tile25 [:tile26]
            :tile26 [:tile1]
-           ; :tile27 [:tile28]
-           ; :tile28 [:tile29]
-           ; :tile29 [:tile1]
            } 
    :tiles {
            :tile1 (make-tile :start-finish) 
-           :tile2 (make-tile :token-change -1)
+           :tile2 (make-tile :token-change 1)
            :tile3 (make-tile)
-           :tile4 (make-tile :token-change 1)
+           :tile4 (make-tile :token-change -1)
            :tile5 (make-tile)
            :tile6 (make-tile :token-change 2)
            :tile7 (make-tile)
@@ -132,28 +138,25 @@
            :tile9 (make-tile :token-change 3)
            :tile10 (make-tile)
            :tile11 (make-tile :lose-a-turn)
-           :tile12 (make-tile)
+           :tile12 (make-tile :token-change -2)
            :tile13 (make-tile :steal)
            :tile14 (make-tile :token-change 2)
            :tile15 (make-tile)
-           :tile16 (make-tile :shortcut-option 8)
+           :tile16 (make-tile :shortcut-option shortcut-cost)
            :tile17 (make-tile :lose-a-turn)
            :tile18 (make-tile)
-           :tile19 (make-tile :token-change 3)
-           :tile20 (make-tile)
-           :tile21 (make-tile :steal)
-           :tile22 (make-tile)
+           :tile19 (make-tile :token-change -1)
+           :tile20 (make-tile :token-change 3)
+           :tile21 (make-tile)
+           :tile22 (make-tile :steal)
            :tile23 (make-tile :token-change -1)
            :tile24 (make-tile)
            :tile25 (make-tile :token-change 2)
            :tile26 (make-tile)
-           :tile27 (make-tile #_:steal)
-           :tile28 (make-tile)
-           :tile29 (make-tile)
            }})
 
 (defn make-game []
-  (let [the-players (make-players 2)] 
+  (let [the-players (make-players num-players)] 
     {:board (make-board)
      :players (zipmap (map :color the-players) the-players)
      :turn 0
