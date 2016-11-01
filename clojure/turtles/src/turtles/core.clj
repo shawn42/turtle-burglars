@@ -24,7 +24,7 @@
    ;;                           (<= tokens-to-take-shortcut (:tokens player)))))})
 (defn make-player [i color] 
   {:color color
-   :tokens (if (zero? i) 0 tokens-to-start)
+   :tokens i #_(if (zero? i) 0 tokens-to-start)
    :skip-next-turn false
    :tile :tile1
    :has-won false
@@ -39,8 +39,7 @@
 (defn make-tile 
   ([] (make-tile :empty 0))
   ([tile-type] (make-tile tile-type 0))
-  ([tile-type value] 
-   {:tile-type tile-type :value value}) )
+  ([tile-type value] {:tile-type tile-type :value value}) )
 
 (defmulti forward-from (fn [game t _ _] (get-in game [:board :tiles t :tile-type])))
 
