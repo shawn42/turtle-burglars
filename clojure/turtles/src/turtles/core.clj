@@ -205,10 +205,6 @@
         (update :next-players rest)
         (update :turn inc))))
 
-(defn do-stuff [game]
-  (doseq [turn-state (take-while (complement nil?) (iterate :previous-game game))]
-    (display-game turn-state) ))
-
 (defn play-game [] 
   (loop [game (make-game)]
     (if (not (has-winner? game))
