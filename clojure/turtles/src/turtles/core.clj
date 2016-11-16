@@ -2,8 +2,8 @@
 (ns turtles.core
   (:require [clojure.pprint :refer [pprint]]))
 
-(def tokens-to-win 14)
-(def tokens-to-take-shortcut 12)
+(def tokens-to-win 12)
+(def tokens-to-take-shortcut 10)
 (def tokens-to-start 1)
 (def num-players 4)
 (def shortcut-cost 4)
