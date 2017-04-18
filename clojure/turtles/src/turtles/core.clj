@@ -150,10 +150,10 @@
            :tile20 (make-tile :token-change 3)
            :tile21 (make-tile :steal) ; corner
            :tile22 (make-tile)
-           :tile23 (make-tile :token-change -2)
-           :tile24 (make-tile)
-           :tile25 (make-tile :token-change 2)
-           :tile26 (make-tile)
+           :tile23 (make-tile)
+           :tile24 (make-tile :token-change -2)
+           :tile25 (make-tile)
+           :tile26 (make-tile :token-change 2)
            }})
 
 (defn make-game []
